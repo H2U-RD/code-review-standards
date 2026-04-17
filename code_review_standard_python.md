@@ -10,7 +10,7 @@
 |------|------|
 | **Critical** | 使用可變物件作為函式預設參數（`def f(items=[])`）：預設值在 module 載入時建立一次，所有呼叫共用同一個物件，造成跨呼叫的狀態污染；應改用 `None` 並在函式內初始化 |
 | **Critical** | Late-binding closure：迴圈內的 lambda / 巢狀函式捕捉迴圈變數（`for i in range(n): fns.append(lambda: i)`），所有函式在呼叫時都讀到最終值；應用預設參數固定（`lambda i=i: i`） |
-| **Major** | 捕捉裸 `except:` 或 `except Exception:` 後靜默吞掉，包含 `KeyboardInterrupt`、`SystemExit` 在內的所有例外皆被掩蓋；應捕捉最小範圍的具體型別 |
+| **Major** | 捕捉裸 `except:` 或 `except Exception:` 後靜默吞掉會掩蓋錯誤；其中裸 `except:` 連 `KeyboardInterrupt`、`SystemExit` 等 `BaseException` 子類也會捕捉，而 `except Exception:` 不包含它們；應捕捉最小範圍的具體型別 |
 | **Major** | 直接比較型別用 `type(x) == Foo` 而非 `isinstance(x, Foo)`，不考慮繼承，且無法配合 duck typing |
 | **Minor** | `is` 用於比較值（`if x is "active"`），`is` 僅保證 CPython 的 small int / interned string，不應依賴；值比較應使用 `==` |
 | **Minor** | 在大型迴圈中用 `+` 串接字串，應改用 `"".join(parts)` 或 `io.StringIO` |
