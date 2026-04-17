@@ -33,7 +33,7 @@
 |------|------|
 | **Critical** | 在迴圈內對關聯物件逐一查詢（N+1）且未使用 `select_related()`（ForeignKey / OneToOne）或 `prefetch_related()`（ManyToMany / reverse FK）合併 |
 | **Critical** | 多個相關 DB 寫入未使用 `transaction.atomic()` 包覆，部分失敗造成資料不一致 |
-| **Major** | QuerySet 在同一 request 內被多次 evaluate（如先轉 `list()` 又再次過濾），應在需要的時機才固定，或用 `_result_cache` 確認是否已快取 |
+| **Major** | QuerySet 在同一 request 內被多次 evaluate（如先轉 `list()` 又再次過濾），應在需要的時機才固定；若需要重用結果，應明確物化成 `list()` 後重用，或重構流程避免重複 evaluate |
 | **Major** | 使用 `Model.objects.all()` 後在 Python 層過濾（`[x for x in qs if x.field == val]`），應將過濾條件下推至 ORM（`.filter(field=val)`） |
 | **Major** | 僅需特定欄位的查詢未使用 `.values()` / `.values_list()` / `.only()` / `.defer()`，回傳完整 model instance 造成不必要的資料傳輸與 object hydration |
 | **Major** | 大量批次寫入用逐筆 `Model.save()`，應改用 `bulk_create()` / `bulk_update()` 減少 round trip |
