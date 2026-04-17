@@ -98,7 +98,7 @@
 | 等級 | 描述 |
 |------|------|
 | **Critical** | Celery task 直接傳入 Django model instance 作為參數——序列化時會快照當下狀態，task 執行時資料可能已過時；應只傳 primary key，在 task 內重新查詢 |
-| **Critical** | Celery task 未設定 `max_retries` 與 retry backoff，在外部服務不可用時會無限重試，耗盡 worker 資源 |
+| **Critical** | Celery task 在啟用 retry / auto-retry 時，若未設定合理的 `max_retries` 與 retry backoff，外部服務不可用時可能造成重試風暴或耗盡 worker 資源 |
 | **Major** | 長時間執行的 Celery task 未處理 `SoftTimeLimitExceeded` exception，worker 被強制終止時無法做清理 |
 | **Major** | Django async view（`async def`）內呼叫同步 ORM（`Model.objects.filter()`）未使用 `sync_to_async()`，在 ASGI 環境下會阻塞 event loop |
 | **Minor** | Celery beat 排程任務缺少冪等性保護，重複執行時可能產生重複資料或副作用 |
