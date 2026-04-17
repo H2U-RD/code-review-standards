@@ -45,62 +45,62 @@
 - Deep link / URL scheme 參數未驗證直接使用，有 URL injection 或 open redirect 風險
 - WebView 載入外部 URL 時，若對不受信任內容暴露 `JavascriptInterface`（Android）、啟用不必要的 JavaScript 執行／原生 bridge（如 message handler）或未限制可導覽的 URL 範圍，可能導致 XSS、任意腳本呼叫原生能力或釣魚頁面風險
 
-### Major
+#### Major
 - 網路請求未啟用 certificate pinning，有中間人攻擊風險（視 app 敏感程度調整）
 - API response 中的敏感欄位被寫入本地 cache 或 DB 而未加密
 - 截圖保護未啟用（金融、醫療類 app 應設定 `FLAG_SECURE` / `.allowsScreenRecording`）
 
-### Minor
+#### Minor
 - 除錯用的 `BuildConfig.DEBUG` flag 邏輯遺留在 release build 路徑中
 
 ---
 
-## 四、網路與離線處理
+### 四、網路與離線處理
 
-### Major
+#### Major
 - 網路請求未設定 timeout，依賴方無回應時無限等待
 - 無任何離線狀態處理，網路斷線時直接 crash 或白畫面，沒有 fallback UI
 - API 錯誤（4xx、5xx、timeout）未分類處理，全部顯示相同錯誤訊息或靜默失敗
 - 重試邏輯在迴圈內無退避策略（exponential backoff），短時間內大量重打造成伺服器壓力
 
-### Minor
+#### Minor
 - 重複的相同請求未做 deduplication 或 cache，每次進入畫面都重新 fetch
 
 ---
 
-## 五、App Lifecycle 處理
+### 五、App Lifecycle 處理
 
-### Major
+#### Major
 - 未處理 app 進入背景 / 前景的狀態恢復，造成資料遺失或 UI 狀態錯誤
 - 系統低記憶體或 process 被殺後重啟，未能正確還原使用者操作狀態
 - 旋轉螢幕或分割畫面造成 configuration change，重新建立元件後資料遺失
 
-### Minor
+#### Minor
 - 背景執行持續佔用資源（位置、感測器、timer）而未在適當時機暫停，造成電池耗損
 
 ---
 
-## 六、效能與使用者體驗
+### 六、效能與使用者體驗
 
-### Major
+#### Major
 - 列表元件（RecyclerView、UITableView、FlatList）未做 view recycling 或 cell reuse，大量資料時 scroll 卡頓
 - 圖片未做 lazy loading 或 cache，每次滑動都重新下載
 - 動畫或過場在低階裝置掉幀，未測試不同效能等級的裝置
 
-### Minor
+#### Minor
 - 初次啟動時一次載入所有資料，應改為分頁或 lazy load
 - 未針對深色模式（Dark Mode）測試 UI 顯示正確性
 
 ---
 
-## 七、程式碼品質與可維護性
+### 七、程式碼品質與可維護性
 
-### Major
+#### Major
 - 業務邏輯寫在 View 層（Activity / Fragment / View / Component），應移至 ViewModel / Presenter / Service
 - Magic number / string 散落在 UI code（hardcoded color hex、固定 pixel 值、hardcoded API path）
 - 平台專屬 code 與共用邏輯混寫，難以跨平台維護或測試
 
-### Minor
+#### Minor
 - 過深的 callback nesting（callback hell），應改用 coroutine / async-await / Combine
 - `TODO` / `FIXME` 留在 code 超過一個 sprint 未處理且無對應 issue
 
@@ -110,45 +110,45 @@
 
 ### A1. Coroutines 與非同步
 
-### Critical
+#### Critical
 - 使用 `GlobalScope.launch`：生命週期不受控，元件銷毀後仍繼續執行，造成 memory leak 與 crash；應使用 `viewModelScope` 或 `lifecycleScope`
 
-### Major
+#### Major
 - 在 `viewModelScope` 以外的 scope 啟動 coroutine 而未綁定 lifecycle，無法自動取消
 - `suspend` function 內使用 blocking call（`Thread.sleep`、`runBlocking`），阻塞 coroutine thread pool
 - Exception 在 coroutine 內未被 `try/catch` 或 `CoroutineExceptionHandler` 處理，靜默失敗
 
-### Minor
+#### Minor
 - `StateFlow` / `SharedFlow` collect 時未在 `Lifecycle.State.STARTED` 以上，app 在背景仍持續收到更新
 
-## A2. MVVM 架構
+### A2. MVVM 架構
 
-### Critical
+#### Critical
 - ViewModel 持有 `Context`（尤其是 `Activity` context），造成 memory leak；需要 context 應使用 `ApplicationContext` 或 `AndroidViewModel`
 
-### Major
+#### Major
 - LiveData / StateFlow 在 View 層直接被修改（應只透過 ViewModel 的方法修改）
 - ViewModel 直接持有 View 的參照或呼叫 View 的方法，破壞單向資料流
 - Repository 層缺失，ViewModel 直接呼叫網路或 DB，無法單獨測試
 
-### Minor
+#### Minor
 - `MutableLiveData` / `MutableStateFlow` 公開暴露（應對外只暴露 immutable 版本）
 
-## A3. Kotlin 特有
+### A3. Kotlin 特有
 
-### Critical
+#### Critical
 - `!!` 強制 non-null 用於來自外部輸入或 API 的資料，null 時直接 crash；應使用 `?.` 或 `?: `
 
-### Major
+#### Major
 - `lateinit var` 在未初始化時被存取，拋出 `UninitializedPropertyAccessException`；應使用 `lazy` 或 nullable
 - `data class` 的 `equals`/`hashCode` 依賴可變欄位，用於 set / map key 時行為不可預測
 
-### Minor
+#### Minor
 - 可用 `data class` 表達的 model 用一般 `class`，缺少自動生成的 `equals`/`copy`/`toString`
 
-## A4. Android 特有
+### A4. Android 特有
 
-### Major
+#### Major
 - `RecyclerView.Adapter` 未使用 `DiffUtil`，資料更新時全部 `notifyDataSetChanged()`，造成閃爍與效能問題
 - 敏感資料存入 `SharedPreferences` 明文，應使用 `EncryptedSharedPreferences`
 - Background task 使用 `AsyncTask`（已廢棄）或裸 `Thread`，應改用 `WorkManager` 或 coroutine
@@ -172,35 +172,35 @@
 #### Critical
 - 業務邏輯、網路請求直接寫在 `View` 的 `body` 內，應移至 `ViewModel`（`ObservableObject`）
 
-### Major
+#### Major
 - `@State` 儲存複雜業務狀態（應只用於 local UI state，如 `isLoading`、`isExpanded`）
 - `@EnvironmentObject` 在未注入的 View 中使用，runtime 直接 crash 且無編譯期警告
 - `View body` 過於複雜（超過 100 行），應拆分為子 View 或 `ViewBuilder` function
 - `@Published` 屬性的更新未在 Main thread 執行，造成 UI 更新警告或 crash；應使用 `@MainActor` 或 `DispatchQueue.main`
 
-### Minor
+#### Minor
 - `ForEach` 缺少穩定的 `id`（使用 index 或非唯一值），資料變動時動畫與狀態錯誤
 
-## B3. Swift 特有
+### B3. Swift 特有
 
-### Critical
+#### Critical
 - Force unwrap `!` 用於 API response 或使用者輸入的可選值，nil 時直接 crash
 
-### Major
+#### Major
 - `async/await` 函式在 `Task {}` 內未處理 cancellation，畫面已關閉後仍繼續執行
 - `Actor` 的 isolated state 在非 actor context 直接存取，破壞 actor 隔離保證
 
-### Minor
+#### Minor
 - `guard let` / `if let` 可以合併的多個 optional binding 分開寫，增加縮排層數
 
-## B4. iOS 特有
+### B4. iOS 特有
 
-### Major
+#### Major
 - 敏感資料存入 `UserDefaults`，應使用 Keychain（`Security` framework 或 `KeychainAccess`）
 - `URLSession` 直接使用而非透過統一的 network layer，無法統一加 auth header、retry、logging
 - Push notification 的 payload 包含敏感個資（應只放 notification ID，資料從 API 拉取）
 
-### Minor
+#### Minor
 - `Info.plist` 的權限說明字串（`NSCameraUsageDescription` 等）語意不清，App Store 審核可能被拒
 
 ---
@@ -209,44 +209,44 @@
 
 ### C1. 效能
 
-### Critical
+#### Critical
 - JS thread 執行 heavy computation（圖片處理、加解密、大量資料運算），阻塞所有 UI 互動；應移至 native module／JSI、`react-native-reanimated` worklet、原生背景執行緒或後端服務。若需 worker 類機制，需額外方案支援，並非 React Native 預設可直接使用瀏覽器 `Web Worker` API
 
-### Major
+#### Major
 - `FlatList` / `SectionList` 缺少 `keyExtractor`、`getItemLayout` 或 `windowSize` 設定，長列表 scroll 效能差
 - 頻繁的 JS-to-Native bridge 呼叫（在動畫迴圈或 scroll handler 內），應使用 `Animated` API 或 `react-native-reanimated` 在 native thread 執行
 - 元件在 parent re-render 時不必要地重新 render，應使用 `React.memo`、`useMemo`、`useCallback`
 
-### Minor
+#### Minor
 - 圖片使用 `require()` 載入大尺寸本地圖片未指定 `width`/`height`，造成 layout shift
 
-## C2. WebView 安全性
+### C2. WebView 安全性
 
-### Critical
+#### Critical
 - WebView 載入外部或使用者提供的 URL 而未做白名單驗證，有跳轉至惡意網頁的風險
 - `onMessage` 接收 WebView postMessage 未驗證來源，直接執行收到的指令；React Native WebView 無對等瀏覽器 `event.origin` 機制，應透過自訂協議或 token 驗證 WebView 傳來的訊息
 - WebView 注入的 `injectedJavaScript` 內容包含使用者輸入，有 XSS 風險
 
-### Major
+#### Major
 - WebView 與 React Native 之間傳遞敏感資料（token、個資）透過 URL query string，會被記錄在 log 中
 - `javaScriptEnabled={false}` 的 WebView 被改為 `true` 而未說明原因及安全評估
 
-## C3. 架構與平台差異
+### C3. 架構與平台差異
 
-### Major
+#### Major
 - 平台專屬邏輯（`Platform.OS === 'ios'`）散落各處而未封裝，同一個判斷在多個元件重複
 - Native module 在 JS 端呼叫後未處理 Promise rejection，錯誤靜默失敗
 - 直接操作 `NativeModules` 而非透過封裝的 hook / service，難以測試與替換
 
-### Minor
+#### Minor
 - `StyleSheet.create` 定義的樣式與 inline style 混用無一致規範
 - Hermes engine 不支援的 JS 語法未在 CI 驗證，可能在 Android release build 才發現問題
 
-## C4. 工程紀律
+### C4. 工程紀律
 
-### Major
+#### Major
 - `package.json` 的 native dependency 版本更新後未執行 `pod install`（iOS）或重新 link（Android），造成 native / JS 版本不一致
 - 新增 native module 後未更新 `.gitignore` 或建置說明，其他開發者無法 build
 
-### Minor
+#### Minor
 - Metro bundler cache 造成的問題以「重新執行就好」帶過，未找出根本原因
