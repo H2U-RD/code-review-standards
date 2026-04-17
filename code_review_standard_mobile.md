@@ -158,20 +158,20 @@
 
 ---
 
-# Appendix B：iOS / Swift / SwiftUI
+## Appendix B：iOS / Swift / SwiftUI
 
-## B1. Memory Management
+### B1. Memory Management
 
-### Critical
+#### Critical
 - **Retain cycle**：closure 內強參照 `self` 而 `self` 又持有該 closure，造成兩者永遠不釋放；`@escaping` closure 應使用 `[weak self]` 或 `[unowned self]`
 - `unowned` 用於生命週期不確定的參照，被參照物件釋放後存取直接 crash；不確定時應用 `weak`
 
-### Major
+#### Major
 - `@StateObject` 用於從父層傳入的物件（應用 `@ObservedObject`），造成每次父層 re-render 都重新初始化
 
-## B2. SwiftUI 架構
+### B2. SwiftUI 架構
 
-### Critical
+#### Critical
 - 業務邏輯、網路請求直接寫在 `View` 的 `body` 內，應移至 `ViewModel`（`ObservableObject`）
 
 ### Major
