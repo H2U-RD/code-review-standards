@@ -212,7 +212,7 @@
 ## C1. 效能
 
 ### Critical
-- JS thread 執行 heavy computation（圖片處理、加解密、大量資料運算），阻塞所有 UI 互動；應移至 native module 或 Web Worker
+- JS thread 執行 heavy computation（圖片處理、加解密、大量資料運算），阻塞所有 UI 互動；應移至 native module／JSI、`react-native-reanimated` worklet、原生背景執行緒或後端服務。若需 worker 類機制，需額外方案支援，並非 React Native 預設可直接使用瀏覽器 `Web Worker` API
 
 ### Major
 - `FlatList` / `SectionList` 缺少 `keyExtractor`、`getItemLayout` 或 `windowSize` 設定，長列表 scroll 效能差
