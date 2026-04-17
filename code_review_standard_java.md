@@ -53,7 +53,7 @@
 
 | 等級 | 描述 |
 |------|------|
-| **Critical** | `catch (Exception e) {}` 完全吞掉例外且無任何 log，呼叫方與監攻系統均無從得知失敗 |
+| **Critical** | `catch (Exception e) {}` 完全吞掉例外且無任何 log，呼叫方與監控系統均無從得知失敗 |
 | **Major** | Checked exception 以 `catch` 吞掉後繼續執行，而非向上拋出或轉換為有語意的 unchecked exception |
 | **Minor** | 直接 `throw new RuntimeException("message")` 而非定義有語意的自訂型別，呼叫方無法針對性 catch |
 
