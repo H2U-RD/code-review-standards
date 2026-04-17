@@ -78,7 +78,7 @@
 
 | 等級 | 描述 |
 |------|------|
-| **Critical** | 在 session / transaction 關閉後存取 lazy-loaded 關聯，拋出 `LazyInitializationException`；應在 transaction 內完成所有取用，或改用 `FetchType.EAGER`（需評估 N+1 風階） |
+| **Critical** | 在 session / transaction 關閉後存取 lazy-loaded 關聯，拋出 `LazyInitializationException`；應在 transaction 內完成所有取用，或改用 `FetchType.EAGER`（需評估 N+1 風險） |
 | **Major** | Entity 關聯預設 `FetchType.EAGER`（`@ManyToOne` 預設值），每次查詢都帶出關聯資料，造成隱性 N+1 或過量資料載入 |
 | **Major** | 雙向關聯未同步維護兩端（只設 `parent.getChildren().add(child)` 而未設 `child.setParent(parent)`），導致 Hibernate 一級快取與 DB 狀態不一致 |
 | **Minor** | 對 Entity 直接使用 `toString()`（IDE 自動生成版本）觸發 lazy 關聯載入，在 log 或 debug 時產生非預期查詢 |
