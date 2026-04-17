@@ -11,35 +11,35 @@
 
 ---
 
-# 通用 Mobile 標準
+## 通用 Mobile 標準
 
-## 一、執行緒安全（Main Thread）
+### 一、執行緒安全（Main Thread）
 
-### Critical
+#### Critical
 - UI 更新在背景執行緒執行（非 Main thread），會造成 UI 錯誤或 crash
 - 網路請求、DB 查詢、檔案 I/O 在 Main thread 執行，阻塞 UI，造成 ANR（Android）或 frozen UI（iOS）
 
-### Major
+#### Major
 - 背景任務結果回到 Main thread 的時機不明確，可能在元件銷毀後才回呼，造成 crash 或 memory leak
 - 共享可變狀態在多執行緒存取而未加任何同步保護
 
 ---
 
-## 二、Memory Management
+### 二、Memory Management
 
-### Critical
+#### Critical
 - **Memory leak**：持有 Activity / Fragment / ViewController 的 static 或長生命週期參照，元件已銷毀但記憶體未釋放
 - Listener、callback、observer 在元件銷毀後未取消訂閱，持續收到事件並可能操作已釋放的 UI
 
-### Major
+#### Major
 - 大型 Bitmap / Image 未做 resize 或 sampling，直接載入原始尺寸造成 OOM
 - 使用完畢的資源（stream、cursor、DB connection）未在 finally / defer 確保釋放
 
 ---
 
-## 三、安全性
+### 三、安全性
 
-### Critical
+#### Critical
 - 敏感資料（token、密碼、個資）以明文寫入 log，可在 logcat / Console 直接讀取
 - 敏感資料儲存於不安全位置（Android `SharedPreferences` 明文、iOS `UserDefaults`），應使用 Keystore / Keychain
 - Deep link / URL scheme 參數未驗證直接使用，有 URL injection 或 open redirect 風險
