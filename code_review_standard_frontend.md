@@ -60,10 +60,10 @@
 ### Critical
 - 直接存取 `window`、`document`、`navigator` 等瀏覽器 API 而未做 SSR 保護，server 端執行時會直接 crash（應使用 `onMounted` 或 `import.meta.client` 保護）
 - **SSR hydration mismatch**：server 與 client render 的 HTML 不一致，導致畫面閃爍或 Vue 拋出 hydration 錯誤（常見於時間、隨機值、瀏覽器專屬資料）
+- `/server/api/` 底下的 endpoint 未驗證身份（缺少 token 驗證或 session 檢查）
 
 ### Major
 - 需要 SEO 的頁面資料在 `onMounted` 內 fetch，server 端不會執行，爬蟲拿不到資料；應改用 `useFetch` 或 `useAsyncData`
-- `/server/api/` 底下的 endpoint 未驗證身份（缺少 token 驗證或 session 檢查）
 - `useAsyncData` 的 key 重複，導致不同頁面的快取資料互相覆蓋
 
 ### Minor
@@ -128,13 +128,8 @@
 
 ## 七、工程紀律
 
-### Critical
-- Commit 包含機密資訊（API key、`.env` 檔案、token）
-
 ### Major
-- Commit message 無法描述做了什麼（如 `fix`、`update`、`wip`）
-- 直接 push to `main` 未走 MR 流程
-- `package-lock.json` 或 `pnpm-lock.yaml` 未進版控，導致不同環境安裝結果不同
+- `package-lock.json`、`yarn.lock` 或 `pnpm-lock.yaml` 未進版控，導致不同環境安裝結果不同
 
 ### Minor
 - 引入新 npm 套件未審查 bundle size（可用 bundlephobia.com）、維護狀態與已知 CVE

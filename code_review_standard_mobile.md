@@ -152,8 +152,6 @@
 - `RecyclerView.Adapter` 未使用 `DiffUtil`，資料更新時全部 `notifyDataSetChanged()`，造成閃爍與效能問題
 - 敏感資料存入 `SharedPreferences` 明文，應使用 `EncryptedSharedPreferences`
 - Background task 使用 `AsyncTask`（已廢棄）或裸 `Thread`，應改用 `WorkManager` 或 coroutine
-
-### Minor
 - ProGuard / R8 rules 未覆蓋新增的第三方 library，release build 可能因 minification 造成 crash
 
 ---
@@ -226,7 +224,7 @@
 
 ### Critical
 - WebView 載入外部或使用者提供的 URL 而未做白名單驗證，有跳轉至惡意網頁的風險
-- `onMessage` 接收 WebView postMessage 未驗證來源（`nativeEvent.url`），直接執行收到的指令
+- `onMessage` 接收 WebView postMessage 未驗證來源，直接執行收到的指令；React Native WebView 無對等瀏覽器 `event.origin` 機制，應透過自訂協議或 token 驗證 WebView 傳來的訊息
 - WebView 注入的 `injectedJavaScript` 內容包含使用者輸入，有 XSS 風險
 
 ### Major

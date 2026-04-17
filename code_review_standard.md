@@ -14,7 +14,6 @@
 ## 一、程式碼品質（可讀性、結構、抽象）
 
 ### Critical
-- 單一方法超過 **200 行**且包含多個業務邏輯分支（God Method）
 - 類別同時承擔超過一個職責（SRP 明顯違反），導致改動一處影響無關功能
 
 ### Major
@@ -23,15 +22,17 @@
 - 命名無法表達意圖（單字母變數、縮寫無法望文生義，排除迴圈 `i/j`）
 - 不知何時該用 Design Pattern：多個 `if/else` 依類型分派不同行為未用 Strategy；物件建立邏輯複雜且散落各處未用 Factory；一個改動需修改多個不相關模組未用 Observer / Event；同一參數層層傳遞穿越多個方法未用 Context object 或 DI
 - Magic number / magic string 直接寫在邏輯中（ID、語言代碼、欄位索引等）未宣告為具名常數
+- 單一方法超過 **200 行**且包含多個業務邏輯分支（God Method），應拆分為具名子方法
+- **Overengineering**：為目前不存在的需求加入抽象層、介面、泛型或 plugin 機制，實際只有一個實作且短期內不會擴充
+- **Overengineering**：使用 design pattern（Strategy、Factory、Observer 等）解決一個簡單的 `if/else` 問題，增加理解成本而無實質收益
+- **Overengineering**：Premature optimization——在沒有效能數據支撐的情況下引入複雜的 cache 策略、非同步佇列或分散式架構
 
 ### Minor
 - 方法超過 **50 行**但邏輯尚可理解，建議拆分
 - 過度拆分：方法只有 2–3 行且只被呼叫一次，拆出來反而增加跳讀負擔，應內聯
-- **Overengineering**：為目前不存在的需求加入抽象層、介面、泛型或 plugin 機制，實際只有一個實作且短期內不會擴充
-- **Overengineering**：使用 design pattern（Strategy、Factory、Observer 等）解決一個簡單的 `if/else` 問題，增加理解成本而無實質收益
-- **Overengineering**：Premature optimization——在沒有效能數據支撐的情況下引入複雜的 cache 策略、非同步佇列或分散式架構
 - 類別/方法命名使用動詞/名詞混亂（如 `UserHelper`、`DataManager`）
 - 巢狀 `if` 超過 3 層，可用 early return 或策略模式簡化
+- 迴圈內大量字串拼接使用低效方式（如重複 concatenation），應使用語言提供的高效字串建構工具
 
 ### Info
 - 可考慮使用語言慣用語法（idioms）改善可讀性
@@ -45,13 +46,14 @@
 - Commit 包含 **機密資訊**（API key、密碼、連線字串明文）
 
 ### Major
-- Commit message 無法描述「做了什麼、為什麼」（如 `fix`、`update`、`test`、`asdf`）
+- Commit message 無法描述「做了什麼、為什麼」（如 `fix`、`update`、`wip`、`asdf`）
 - 單一 commit 混合多個無關的變更（應拆為獨立 commit）
 - 直接 push to `main` / `develop` 而未走 MR 流程
 
 ### Minor
 - Commit message 未遵守專案約定格式（如缺少 issue 編號前綴）
 - Branch 命名不符合規範（如 `fix-bug` 而非 `bugfix/PROJ-123-description`）
+- 新增第三方套件未審查 license、維護狀態與已知 CVE
 
 ### Info
 - 建議使用 Conventional Commits 格式（`feat:`, `fix:`, `refactor:` 等）
@@ -61,9 +63,9 @@
 ## 三、效能與正確性（N+1、Null Safety、Cache Strategy）
 
 ### Critical
-- **N+1 Query**：在迴圈內逐次打 DB，且資料量無上限（未加分頁或筆數保護）
+- **N+1 Query**：在迴圈內逐次打 DB，未以批次查詢或預先載入合併，有分頁時每頁仍可能觸發大量查詢
 - Null dereference 風險：直接存取可能為 null 的物件成員未做 null 檢查，且物件來源為外部輸入或 DB 查詢結果
-- 同一查詢在同一 request 內重複執行兩次以上，且第一次結果未被使用
+- 同一查詢在同一 request 內重複執行兩次以上，結果未被快取重用
 
 ### Major
 - 迴圈內的 DB 查詢可用批次查詢或預先載入（eager loading）合併，但未優化
@@ -115,9 +117,6 @@
 ### Minor
 - `TODO` / `FIXME` 留在 code 中超過一個 sprint 未處理且無對應 issue
 
-### Info
-- 長時間執行的操作建議支援取消（cancellation）機制，以便 graceful shutdown
-
 ---
 
 ## 六、可觀測性（Observability）
@@ -161,13 +160,14 @@
 
 ## 八、API 設計與版本控制（API Design & Versioning）
 
+### Critical
+- **Breaking Change 禁止未版本化**：既存對外 API 的欄位禁止直接刪除或更名；若需更動，必須透過版本號（Versioning）或保留舊欄位並標註 Deprecated，確保向下相容性，避免下游服務或 Mobile App 靜默崩潰
+
 ### Major
 - **直接回傳內部 domain model / ORM entity** 作為 API response，導致 domain 與 API contract 強耦合，無法獨立演進；應使用專用 DTO
 - **Chatty API 設計**：用戶端需發多次連續請求才能組出一個完整畫面，應考慮合併為單一端點或使用 BFF 模式
 - **回傳過量資料**：response 包含用戶端不需要的欄位，造成不必要的序列化與網路傳輸開銷
 
-### Minor
-- 新增第三方套件未審查 license、維護狀態與已知 CVE
 
 ---
 
@@ -210,7 +210,6 @@
 ### Major
 - 字串比較未指定 locale / collation，在不同語系環境行為不一致
 - 硬寫環境相關設定（URL、帳號、flag）而非透過環境變數或配置注入，導致設定無法在不同環境間替換
-- 迴圈內大量字串拼接使用低效方式（如重複 concatenation），應使用語言提供的高效字串建構工具
 
 ### Minor
 - 惰性求值的集合在同一資料集上多次 iterate，應先具體化（materialize）固定結果以避免重複計算或副作用
@@ -236,6 +235,7 @@
 ### Critical
 - 修改 shared service 的方法簽章、DB schema 或 API response 結構，未評估所有呼叫方的影響，導致其他模組靜默錯誤或資料損毀
 - 改動範圍與實際影響範圍嚴重不對稱（diff 只改 3 行，卻影響整個 domain 的核心行為），且 commit message 或 PR 說明完全未提及潛在影響
+- **業務意圖不符**：PR 的程式碼實作與 PR 描述或關聯 Ticket 的需求規格明顯不符，或 Reviewer 無法從 PR 資訊推斷實作意圖；此情況應退回要求補充說明，而非帶疑問 approve
 
 ### Major
 - Local optimization 造成 global regression：例如新增 index 加速特定查詢，但顯著拖慢整體 write throughput，未在 PR 中說明 tradeoff
@@ -258,3 +258,14 @@
 - **Major**：用 flag parameter（如 `isNewFlow = true`）區分新舊行為，而非統一邏輯——這是 Fear of touching 的典型症狀
 - **Major**：在舊方法旁邊新增幾乎相同的方法（如 `GetUserV2`），而非重構既有方法，導致兩套邏輯並行維護
 - **Minor**：PR 中明確繞過已知問題（workaround）而非修正，且未開 follow-up issue 或說明原因
+
+---
+
+## 十四、測試（Testing）
+
+### Major
+- 涉及業務運算、狀態轉換或金額計算的核心邏輯，未附帶對應的單元測試
+- 測試案例彼此依賴特定執行順序，或未隔離外部依賴（DB、第三方 API），導致測試環境不穩定、CI flaky
+
+### Minor
+- 測試命名未能描述測試意圖（如 `testMethod1`、`test1`）；建議採用 Given/When/Then 或 Should/When 格式清楚說明前提、操作與預期結果
