@@ -1,35 +1,35 @@
-# Code Review Standards
+# 程式碼審查規範
 
-A shared repository of code review guidelines used across engineering teams. Standards are organized by a universal base ruleset plus language/platform-specific supplements.
+工程團隊共用的程式碼審查準則集中管理庫。規範分為通用基礎規則集，以及各語言／平台的專項補充文件。
 
-## Severity Levels
+## 嚴重程度等級
 
-| Level | Description | Merge Condition |
-|-------|-------------|-----------------|
-| **Critical** | Bug, security vulnerability, data loss, or system crash | Must be fixed before merge |
-| **Major** | Significant impact on maintainability, performance, observability, or engineering discipline | Should be fixed, or documented rationale required for reviewer to approve |
-| **Minor** | Suggested improvement, does not block functionality | May be addressed in a follow-up PR with a tracked issue |
-| **Info** | Style suggestions, learning resources, observations | No response required |
+| 等級 | 說明 | 合併條件 |
+|------|------|----------|
+| **Critical（嚴重）** | 程式錯誤、資安漏洞、資料遺失或系統崩潰 | 合併前必須修正 |
+| **Major（重要）** | 對可維護性、效能、可觀測性或工程紀律有顯著影響 | 應予修正，或需提供審查者同意的書面理由 |
+| **Minor（次要）** | 建議改善項目，不影響功能運作 | 可建立追蹤議題，於後續 PR 處理 |
+| **Info（資訊）** | 風格建議、學習資源、觀察事項 | 無須回應 |
 
-## Standards
+## 規範文件
 
-| Document | Scope |
-|----------|-------|
-| [code_review_standard.md](code_review_standard.md) | Universal — applies to all languages and platforms |
-| [code_review_standard_dotnet.md](code_review_standard_dotnet.md) | .NET / C# specific |
-| [code_review_standard_java.md](code_review_standard_java.md) | Java specific |
+| 文件 | 適用範圍 |
+|------|----------|
+| [code_review_standard.md](code_review_standard.md) | 通用 — 適用於所有語言與平台 |
+| [code_review_standard_dotnet.md](code_review_standard_dotnet.md) | .NET / C# 專項 |
+| [code_review_standard_java.md](code_review_standard_java.md) | Java 專項 |
 | [code_review_standard_frontend.md](code_review_standard_frontend.md) | TypeScript / Vue / Nuxt |
 | [code_review_standard_python.md](code_review_standard_python.md) | Python / Django / Wagtail |
 | [code_review_standard_mobile.md](code_review_standard_mobile.md) | Android / iOS / React Native |
 
-## How to Use
+## 使用方式
 
-1. Start with the **universal standard** ([code_review_standard.md](code_review_standard.md)) for all reviews.
-2. Apply the relevant **language/platform supplement** on top based on the PR's tech stack.
-3. When leaving review comments, prefix each with its severity level (e.g. `[Critical]`, `[Major]`).
+1. 所有審查請先參照**通用規範** ([code_review_standard.md](code_review_standard.md))。
+2. 依據 PR 的技術棧，疊加套用對應的**語言／平台補充規範**。
+3. 留下審查意見時，請在每則留言前標註嚴重程度等級（例如 `[Critical]`、`[Major]`）。
 
-## Contributing
+## 貢獻方式
 
-To propose a new rule or modify an existing one, open a Merge Request with:
-- The rule added to the appropriate severity section
-- A brief rationale explaining the failure mode it prevents
+若要新增規則或修改現有規則，請開立 Merge Request 並包含：
+- 將規則加入對應嚴重程度的章節
+- 簡短說明此規則所預防的失效情境
