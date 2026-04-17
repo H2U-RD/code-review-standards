@@ -106,9 +106,9 @@
 
 ---
 
-# Appendix A：Android / Kotlin
+## Appendix A：Android / Kotlin
 
-## A1. Coroutines 與非同步
+### A1. Coroutines 與非同步
 
 ### Critical
 - 使用 `GlobalScope.launch`：生命週期不受控，元件銷毀後仍繼續執行，造成 memory leak 與 crash；應使用 `viewModelScope` 或 `lifecycleScope`
