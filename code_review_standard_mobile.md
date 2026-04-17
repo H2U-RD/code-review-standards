@@ -43,7 +43,7 @@
 - 敏感資料（token、密碼、個資）以明文寫入 log，可在 logcat / Console 直接讀取
 - 敏感資料儲存於不安全位置（Android `SharedPreferences` 明文、iOS `UserDefaults`），應使用 Keystore / Keychain
 - Deep link / URL scheme 參數未驗證直接使用，有 URL injection 或 open redirect 風險
-- WebView 載入外部 URL 時啟用 `JavascriptInterface`（Android）或 `allowsInlineMediaPlayback` 搭配不受信任來源，有 XSS 風險
+- WebView 載入外部 URL 時，若對不受信任內容暴露 `JavascriptInterface`（Android）、啟用不必要的 JavaScript 執行／原生 bridge（如 message handler）或未限制可導覽的 URL 範圍，可能導致 XSS、任意腳本呼叫原生能力或釣魚頁面風險
 
 ### Major
 - 網路請求未啟用 certificate pinning，有中間人攻擊風險（視 app 敏感程度調整）
