@@ -247,13 +247,13 @@
 - 改動涉及多個 bounded context 但未說明設計決策，reviewers 無法判斷這是刻意設計還是邊界劃分錯誤
 - 新功能未考慮與既有 convention（命名、錯誤碼、response 結構）的一致性，形成系統內的孤島
 
-### 未深讀現有 Code / 文件（Not Reading Before Writing）
+#### 未深讀現有 Code / 文件（Not Reading Before Writing）
 - **Major**：重新實作 codebase 中已存在的 utility / helper / service，造成重複邏輯並行維護
 - **Major**：同一檔案或模組已有明確的 pattern，新增的 code 自成一套，風格與結構不一致
 - **Major**：呼叫或 override 方法前未讀其 contract（參數語意、回傳值、前置條件），導致錯誤使用
 - **Minor**：文件或註解明確標示的限制條件（如「此方法非 thread-safe」、「需先呼叫 Init」），commit 中未遵守且無說明
 
-### 技術債迴避（Avoiding Ownership）
+#### 技術債迴避（Avoiding Ownership）
 - **Major**：新功能建立在已知有缺陷的舊邏輯上，未修正底層問題，且無說明為何不一併修正
 - **Major**：用 flag parameter（如 `isNewFlow = true`）區分新舊行為，而非統一邏輯——這是 Fear of touching 的典型症狀
 - **Major**：在舊方法旁邊新增幾乎相同的方法（如 `GetUserV2`），而非重構既有方法，導致兩套邏輯並行維護
