@@ -207,9 +207,9 @@
 
 ---
 
-# Appendix C：React Native
+## Appendix C：React Native
 
-## C1. 效能
+### C1. 效能
 
 ### Critical
 - JS thread 執行 heavy computation（圖片處理、加解密、大量資料運算），阻塞所有 UI 互動；應移至 native module／JSI、`react-native-reanimated` worklet、原生背景執行緒或後端服務。若需 worker 類機制，需額外方案支援，並非 React Native 預設可直接使用瀏覽器 `Web Worker` API
